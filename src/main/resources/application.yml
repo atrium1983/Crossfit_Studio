@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: crossfit-studio
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: korolev.artyom@gmail.com
+    password: tzyqccntbqltmwfc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+token:
+  signing:
+    key: 53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855
