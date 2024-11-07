@@ -65,6 +65,17 @@ public class TrainingService {
         return trainings;
     }
 
+    public List<TrainingInfoDTO> findAllTrainingsByUserId(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + id + " does not exist"));
+        List<Reservation> reservations = user.getReservations();
+        List<TrainingInfoDTO> trainings = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            TrainingInfoDTO trainingInfoDTO = findTrainingInfoById(reservation.getTraining().getId());
+            trainings.add(trainingInfoDTO);
+        }
+        return trainings;
+    }
     public List<TrainingInfoDTO> findAllTrainingsByUserLogin(String login){
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new NoSuchElementException("User with login " + login + " does not exist"));

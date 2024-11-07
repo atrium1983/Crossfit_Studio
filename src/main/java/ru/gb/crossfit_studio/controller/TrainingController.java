@@ -19,13 +19,7 @@ public class TrainingController {
 
     private final TrainingService trainingService;
 
-//    @GetMapping("/id/{id}")
-//    public ResponseEntity<Training> getById(@PathVariable Long id){
-//        Optional<Training> training = trainingService.findById(id);
-//        return training.map(value -> ResponseEntity.status(HttpStatus.OK).body(value)).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<TrainingInfoDTO> getTrainingInfoById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(trainingService.findTrainingInfoById(id));
@@ -49,18 +43,19 @@ public class TrainingController {
         return ResponseEntity.notFound().build();
     }
 
-//    @GetMapping("/user/{id}") //просмотр всех тренировок клиента по его id
-//    public ResponseEntity<List<Training>> getAllTrainingsByUserId(@PathVariable Long id){
-//        try {
-//            return ResponseEntity.ok(trainingService.findAllTrainingsByUserId(id));
-//        } catch (NoSuchElementException e){
-//            System.out.println(e);
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @GetMapping("/all-by-user/{id}")
+    public ResponseEntity<List<TrainingInfoDTO>> getAllTrainingsByUserId(@PathVariable Long id){
+        try {
+            return ResponseEntity.ok(trainingService.findAllTrainingsByUserId(id));
+        } catch (NoSuchElementException e){
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-    @GetMapping("/user/{login}") //просмотр всех тренировок клиента по его login
-    public ResponseEntity<List<TrainingInfoDTO>> getAllTrainingsByUserLogin(@PathVariable String login){
+
+    @GetMapping("/user/{login}")
+    public ResponseEntity<List<TrainingInfoDTO>> getAllTrainingsByLoginByUser(@PathVariable String login){
         try {
             return ResponseEntity.ok(trainingService.findAllTrainingsByUserLogin(login));
         } catch (NoSuchElementException e){

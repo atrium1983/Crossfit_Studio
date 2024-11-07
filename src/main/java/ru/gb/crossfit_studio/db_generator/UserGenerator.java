@@ -97,8 +97,10 @@ public class UserGenerator {
             user.setLastName(generateMaleLastName());
         }
         user.setDateOfBirth(generateDateOfBirth());
-        user.setEmail(generateEmail(user.getLastName(), user.getFirstName()));
-        user.setLogin(user.getEmail());
+        user.setEmail("artem.cherepanov530@gmail.com");
+        user.setLogin(generateEmail(user.getLastName(), user.getFirstName()));
+//        user.setEmail(generateEmail(user.getLastName(), user.getFirstName()));
+//        user.setLogin(user.getEmail());
         user.setPassword(passwordEncoder().encode(convertCyrilic(user.getLastName())));
         user.setRole(role);
 

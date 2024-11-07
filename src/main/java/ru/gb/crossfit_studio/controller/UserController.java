@@ -26,13 +26,12 @@ public class UserController {
         return user.map(value -> ResponseEntity.status(HttpStatus.OK).body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-//    @GetMapping("/login/{id}")
-//    public ResponseEntity<User> getByLogin(@PathVariable Long id){
-//        Optional<User> user = userService.findById(id);
-//        return user.map(value -> ResponseEntity.status(HttpStatus.OK).body(value)).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
     @GetMapping("/user/{login}")
+    public ResponseEntity<User> getByLoginByCustomer(@PathVariable String login){
+        return ResponseEntity.ok(userService.findByLogin(login));
+    }
+
+    @GetMapping("/{login}")
     public ResponseEntity<User> getByLogin(@PathVariable String login){
         return ResponseEntity.ok(userService.findByLogin(login));
     }
@@ -48,27 +47,7 @@ public class UserController {
 
     }
 
-//    @GetMapping("/trainings/{id}") // посмотреть кто забронировал определенную по её id
-//    public ResponseEntity<List<User>> getUsersByTrainingId(@PathVariable Long id){
-//        try {
-//            return ResponseEntity.ok(userService.findAllUsersByTrainingId(id));
-//        } catch (NoSuchElementException e){
-//            System.out.println(e);
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-//    @GetMapping("/trainings/{id}") // посмотреть кто забронировал определенную по её id
-//    public ResponseEntity<List<UserNameDTO>> getUsersByTrainingId(@PathVariable Long id){
-//        try {
-//            return ResponseEntity.ok(userService.findAllUsersByTrainingId(id));
-//        } catch (NoSuchElementException e){
-//            System.out.println(e);
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserDTO userDTO){
         try {
             User updatedUser = userService.updateById(id, userDTO);

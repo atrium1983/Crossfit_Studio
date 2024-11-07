@@ -17,5 +17,6 @@ public class ReservationInfoDTO {
     private LocalTime time;
     private String firstName;
     private String lastName;
+    private Long trainingId;
     private ReservationStatus status;
 }

@@ -23,7 +23,7 @@ public class DefaultEmailService {
     public void sendWaitingListConfirmation(String email, String name, LocalDate date, LocalTime time){
         String subject = "Тренировка в листе ожидания";
         String body = "Привет, " + name + "! На тренировке " + date + " в " + time + " сейчас нет мест, " +
-                "но мы поставили тебя в лист ожидания. Если твоё бронирование будет подтверждено, " +
+                "но мы добавили тебя в лист ожидания. Если твоё бронирование будет подтверждено, " +
                 "мы отправим тебе сообщение. ";
         sendEmail(email, subject, body);
     }
@@ -49,6 +49,18 @@ public class DefaultEmailService {
     public void sendPasswordChangeConfirmation(String email, String name) {
         String subject = "Подтверждение нового пароля";
         String body = "Привет, " + name + "! Твой пароль был успешно изменен.";
+        sendEmail(email, subject, body);
+    }
+
+    public void sendLoginChangeConfirmation(String email, String name) {
+        String subject = "Подтверждение изменения логина";
+        String body = "Привет, " + name + "! Твой логин был успешно изменен.";
+        sendEmail(email, subject, body);
+    }
+
+    public void sendProfileCreationConfirmation(String email, String name){
+        String subject = "Создание нового профиля";
+        String body = "Привет, " + name + "! Твой профиль был успешно создан в CrossFit Studio. Добро пожаловать!";
         sendEmail(email, subject, body);
     }
 

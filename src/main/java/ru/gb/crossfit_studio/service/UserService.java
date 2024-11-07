@@ -73,6 +73,7 @@ public class UserService {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new NoSuchElementException("User with login " + login + " does not exist"));
         user.setLogin(newLogin.getLogin());
+        emailService.sendLoginChangeConfirmation(user.getEmail(), user.getFirstName());
 
         return userRepository.save(user);
     }
@@ -107,6 +108,7 @@ public class UserService {
             user.setLogin(userData.getLogin());
             user.setPassword(passwordEncoder().encode(userData.getPassword()));
             user.setRole(Role.valueOf(userData.getRole()));
+            emailService.sendProfileCreationConfirmation(userData.getEmail(), user.getFirstName());
 
             return userRepository.save(user);
         }

@@ -1,7 +1,7 @@
 package ru.gb.crossfit_studio.model;
 
 public enum ReservationStatus {
-    CONFIRMED("confirmed"), WAITING_LIST("waitingList"), EXECUTED("executed"), CANCELED("canceled");
+    CONFIRMED("confirmed"), WAITING_LIST("waitingList"), EXECUTED("executed");
 
     private final String status;
 

@@ -6,6 +6,7 @@ import ru.gb.crossfit_studio.email.DefaultEmailService;
 import ru.gb.crossfit_studio.model.*;
 import ru.gb.crossfit_studio.model.DTO.ReservationDTO;
 import ru.gb.crossfit_studio.model.DTO.ReservationInfoDTO;
+import ru.gb.crossfit_studio.model.DTO.ReservationShortInfoDTO;
 import ru.gb.crossfit_studio.repository.UserRepository;
 import ru.gb.crossfit_studio.repository.ReservationRepository;
 import ru.gb.crossfit_studio.repository.TrainingRepository;
@@ -37,15 +38,39 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
+//    public ReservationInfoDTO findReservationInfoById(Long id){
+//        Reservation reservation = findById(id)
+//                .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist"));
+//
+//        return new ReservationInfoDTO(reservation.getId()
+//                , reservation.getTraining().getDate()
+//                , reservation.getTraining().getTime()
+//                , reservation.getUser().getFirstName()
+//                , reservation.getUser().getLastName()
+//                , reservation.getTraining().getId()
+//                , reservation.getStatus());
+//    }
+
     public ReservationInfoDTO findReservationInfoById(Long id){
+        ReservationShortInfoDTO reservationShortInfoDTO = findReservationShortInfoById(id);
+
+        return new ReservationInfoDTO(reservationShortInfoDTO.getId()
+                , reservationShortInfoDTO.getDate()
+                , reservationShortInfoDTO.getTime()
+                , findById(reservationShortInfoDTO.getId()).get().getUser().getFirstName()
+                , findById(reservationShortInfoDTO.getId()).get().getUser().getLastName()
+                , reservationShortInfoDTO.getTrainingId()
+                , reservationShortInfoDTO.getStatus());
+    }
+
+    public ReservationShortInfoDTO findReservationShortInfoById(Long id){
         Reservation reservation = findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist"));
 
-        return new ReservationInfoDTO(reservation.getId()
+        return new ReservationShortInfoDTO(reservation.getId()
                 , reservation.getTraining().getDate()
                 , reservation.getTraining().getTime()
-                , reservation.getUser().getFirstName()
-                , reservation.getUser().getLastName()
+                , reservation.getTraining().getId()
                 , reservation.getStatus());
     }
 
@@ -59,13 +84,35 @@ public class ReservationService {
         }
     }
 
-    public List<ReservationInfoDTO> findAllReservationsByLogin(String login){
+    public ReservationInfoDTO findReservationInfoByIdAndUserId(Long id, Long userId){
+        Reservation reservation = findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist"));
+        if(reservation.getUser().getId().equals(userId)){
+            return findReservationInfoById(id);
+        } else {
+            throw new RuntimeException("Reservation with id " + id + " is not related to user with id + " + userId);
+        }
+    }
+
+    public List<ReservationShortInfoDTO> findAllReservationsByLogin(String login){
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new NoSuchElementException("User with login " + login + " does not exist"));
-        List<ReservationInfoDTO> reservationInfoDTOList = new ArrayList<>();
+        List<ReservationShortInfoDTO> reservationInfoDTOList = new ArrayList<>();
         List<Reservation> reservations = user.getReservations();
         for (Reservation reservation : reservations) {
-            reservationInfoDTOList.add(findReservationInfoById(reservation.getId()));
+            reservationInfoDTOList.add(findReservationShortInfoById(reservation.getId()));
+        }
+
+        return reservationInfoDTOList;
+    }
+
+    public List<ReservationShortInfoDTO> findAllReservationsByUserId(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + id + " does not exist"));
+        List<ReservationShortInfoDTO> reservationInfoDTOList = new ArrayList<>();
+        List<Reservation> reservations = user.getReservations();
+        for (Reservation reservation : reservations) {
+            reservationInfoDTOList.add(findReservationShortInfoById(reservation.getId()));
         }
 
         return reservationInfoDTOList;
@@ -162,7 +209,11 @@ public class ReservationService {
         Reservation reservation = findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist"));
         if(reservation.getUser().getLogin().equals(login)){
-            deleteById(id);
+            if(!reservation.getStatus().equals(ReservationStatus.EXECUTED)){
+                deleteById(id);
+            } else {
+                throw new RuntimeException("Reservation with id " + id + " has status EXECUTED and can not be deleted");
+            }
         } else {
             throw new RuntimeException("Reservation with id " + id + " is not related to user with login + " + login);
         }
@@ -205,6 +256,22 @@ public class ReservationService {
         trainingRepository.save(training);
     }
 
+    public void confirmReservationOverLimit(Long reservationId){
+        Reservation reservation = findById(reservationId)
+                .orElseThrow(() -> new NoSuchElementException("Reservation with id " + reservationId + " does not exist"));
+        if(reservation.getStatus().equals(ReservationStatus.WAITING_LIST)){
+            reservation.setStatus(ReservationStatus.CONFIRMED);
+            reservationRepository.save(reservation);
+            emailService.sendConfirmation(
+                    reservation.getUser().getEmail(),
+                    reservation.getUser().getFirstName(),
+                    reservation.getTraining().getDate(),
+                    reservation.getTraining().getTime());
+        } else {
+            throw new RuntimeException("Reservation with id " + reservationId + "is not on waiting list");
+        }
+    }
+
     public List<Reservation> cleanWaitingList (List<Reservation> reservations){
         reservations.removeIf(reservation -> reservation.getStatus().equals(ReservationStatus.WAITING_LIST));
         return reservations;
@@ -235,11 +302,13 @@ public class ReservationService {
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void remindAboutTraining(){
         List<Training> trainingsToday = trainingRepository.findAllByDate(LocalDate.now());
         for (Training training : trainingsToday) {
-            if(training.isAvailable() && training.getTime().isBefore(LocalTime.now().plusHours(1))) {
+//            if(training.isAvailable() && training.getTime().isBefore(LocalTime.now().plusHours(1))) {
+            if(training.isAvailable() && training.getTime().isAfter(LocalTime.now().plusMinutes(59))
+                    && training.getTime().isBefore(LocalTime.now().plusHours(1))) {
                 for (Reservation reservation : training.getReservations()) {
                     if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
                         emailService.sendTrainingReminder(

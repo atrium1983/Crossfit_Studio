@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.gb.crossfit_studio.model.DTO.ReservationInfoDTO;
+import ru.gb.crossfit_studio.model.DTO.ReservationShortInfoDTO;
 import ru.gb.crossfit_studio.model.Reservation;
 import ru.gb.crossfit_studio.model.DTO.ReservationDTO;
 import ru.gb.crossfit_studio.service.ReservationService;
@@ -47,8 +48,18 @@ public class ReservationController {
         }
     }
 
+    @GetMapping("/all-by-user/{id}")
+    public ResponseEntity<List<ReservationShortInfoDTO>> getAllReservationsByUserId(@PathVariable Long id){
+        try {
+            return ResponseEntity.ok(reservationService.findAllReservationsByUserId(id));
+        } catch (NoSuchElementException e){
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/user/{login}")
-    public ResponseEntity<List<ReservationInfoDTO>> getAllReservationsByLogin(@PathVariable String login){
+    public ResponseEntity<List<ReservationShortInfoDTO>> getAllReservationsByLogin(@PathVariable String login){
         try {
             return ResponseEntity.ok(reservationService.findAllReservationsByLogin(login));
         } catch (NoSuchElementException e){
@@ -103,7 +114,6 @@ public class ReservationController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
         try{
             reservationService.deleteById(id);
-//            reservationService.deleteReservationFromTraining(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e){
             System.out.println(e);
@@ -115,7 +125,6 @@ public class ReservationController {
     public ResponseEntity<Void> deleteByIdByLogin(@PathVariable String login, @PathVariable Long id) {
         try {
             reservationService.deleteByIdByLogin(id, login);
-//            reservationService.deleteReservationFromTraining(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
             System.out.println(e);

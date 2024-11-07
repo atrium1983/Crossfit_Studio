@@ -37,7 +37,6 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                // Своего рода отключение CORS (разрешение запросов со всех доменов)
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new CorsConfiguration();
                     corsConfiguration.setAllowedOriginPatterns(List.of("*"));
@@ -46,12 +45,10 @@ public class SecurityConfiguration {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
-                // Настройка доступа к конечным точкам
                 .authorizeHttpRequests(request -> request
-                        // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users").permitAll()
-                        .requestMatchers("/users/**", "/trainings/**", "/reservations/**").permitAll()
+                        .requestMatchers("/trainings/id/*").hasAnyRole("CUSTOMER", "TRAINER", "ADMIN")
                         .requestMatchers("/users/user/{login}"
                                 ,"/users/update/login/{login}"
                                 ,"/users/update/email/{login}"
@@ -60,9 +57,8 @@ public class SecurityConfiguration {
                                 ,"/reservations/user/{login}/**").access((authentication, object) ->
                                 new AuthorizationDecision(
                                         object.getRequest().getServletPath().contains(authentication.get().getName())))
-                        .requestMatchers("/trainings/id/**").hasRole("CUSTOMER")
-                        .requestMatchers("/trainings", "/trainings/update/**").hasRole("TRAINER")
-                        .requestMatchers("/users/**", "/trainings/**", "/reservations/**").hasRole("ADMIN")
+                        .requestMatchers("/users/**", "/reservations/**").hasRole("ADMIN")
+                        .requestMatchers("/trainings/**").hasAnyRole("ADMIN", "TRAINER")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
@@ -74,7 +70,6 @@ public class SecurityConfiguration {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userService.userDetailsService());
-//        authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setPasswordEncoder(userService.passwordEncoder());
         return authProvider;
     }
