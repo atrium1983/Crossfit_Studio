@@ -97,10 +97,8 @@ public class UserGenerator {
             user.setLastName(generateMaleLastName());
         }
         user.setDateOfBirth(generateDateOfBirth());
-        user.setEmail("artem.cherepanov530@gmail.com");
-        user.setLogin(generateEmail(user.getLastName(), user.getFirstName()));
-//        user.setEmail(generateEmail(user.getLastName(), user.getFirstName()));
-//        user.setLogin(user.getEmail());
+        user.setEmail(generateEmail(user.getLastName(), user.getFirstName()));
+        user.setLogin(user.getEmail());
         user.setPassword(passwordEncoder().encode(convertCyrilic(user.getLastName())));
         user.setRole(role);
 
@@ -119,9 +117,6 @@ public class UserGenerator {
     }
 
     public void generateUsersInRepository(UserRepository userRepository, Role role, int num){
-//        for (int i = 1; i <= num; i++) {
-//            userRepository.save(generateRandUser(role));
-//        }
         List<User> users = generateUserList(role, num);
         for (User user : users) {
             userRepository.save(user);

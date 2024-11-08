@@ -38,19 +38,6 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-//    public ReservationInfoDTO findReservationInfoById(Long id){
-//        Reservation reservation = findById(id)
-//                .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist"));
-//
-//        return new ReservationInfoDTO(reservation.getId()
-//                , reservation.getTraining().getDate()
-//                , reservation.getTraining().getTime()
-//                , reservation.getUser().getFirstName()
-//                , reservation.getUser().getLastName()
-//                , reservation.getTraining().getId()
-//                , reservation.getStatus());
-//    }
-
     public ReservationInfoDTO findReservationInfoById(Long id){
         ReservationShortInfoDTO reservationShortInfoDTO = findReservationShortInfoById(id);
 
@@ -306,7 +293,6 @@ public class ReservationService {
     public void remindAboutTraining(){
         List<Training> trainingsToday = trainingRepository.findAllByDate(LocalDate.now());
         for (Training training : trainingsToday) {
-//            if(training.isAvailable() && training.getTime().isBefore(LocalTime.now().plusHours(1))) {
             if(training.isAvailable() && training.getTime().isAfter(LocalTime.now().plusMinutes(59))
                     && training.getTime().isBefore(LocalTime.now().plusHours(1))) {
                 for (Reservation reservation : training.getReservations()) {

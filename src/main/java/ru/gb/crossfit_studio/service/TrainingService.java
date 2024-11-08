@@ -12,7 +12,6 @@ import java.util.*;
 
 @Service
 public class TrainingService {
-
     private final TrainingRepository trainingRepository;
     private final UserRepository userRepository;
 
@@ -38,13 +37,6 @@ public class TrainingService {
                     reservation.getStatus()));
         }
 
-//        TrainingInfoDTO trainingInfoDTO = new TrainingInfoDTO(
-//                training.getDate(),
-//                training.getTime(),
-//                training.getTrainingPlan(),
-//                training.getReservationLimit(),
-//                users
-//        );
         TrainingInfoDTO trainingInfoDTO = new TrainingInfoDTO();
         trainingInfoDTO.setDate(training.getDate());
         trainingInfoDTO.setTime(training.getTime());
@@ -172,26 +164,4 @@ public class TrainingService {
         return true;
     }
 
-//    @Scheduled(cron = "* 1 * * * *", zone = "Europe/Moscow")
-//    @Scheduled(fixedDelay = 10000)
-//    public void doTraining(){
-////        System.out.println("do Traing works");
-//        List<Training> trainingsToday = findAllByDate(LocalDate.now());
-//        for (Training training : trainingsToday) {
-////            if (training.getTime().getHour() == LocalTime.now().getHour()) {
-//            if (training.getTime() == LocalTime.now()) {
-//                training.setAvailable(false);
-////                List<Reservation> reservations = training.getReservations();
-////                for (Reservation reservation : reservations) {
-////                    if(reservation.getStatus().equals(ReservationStatus.CONFIRMED)){
-////                        reservation.setStatus(ReservationStatus.EXECUTED);
-////                    } else {
-////                        reservations.remove(reservation);
-////                    }
-////                    rese
-////                }
-//                trainingRepository.save(training);
-//            }
-//        }
-//    }
 }

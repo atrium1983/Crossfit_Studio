@@ -35,21 +35,13 @@ public class TrainingGenerator {
         return training;
     }
 
-//    public Training generateTraining(LocalDate date, LocalTime time){
-//        return new Training(date, time, trainingPlan[getRandomInt(trainingPlan.length)]);
-//    }
-
     public int getRandomInt(int bound){
         return ThreadLocalRandom.current().nextInt(bound);
     }
 
-    // генерируем расписания тренировок в репозитории
     public void generateTrainingsInRepository(TrainingRepository trainingRepository, LocalDate startDate, int days){
         for (int i = 0; i < days; i++) {
             for (LocalTime time : trainingHour) {
-//                Training training = generateTraining(startDate.plusDays(i), time);
-//                System.out.println(training);
-//                trainingRepository.save(training);
                 trainingRepository.save(generateTraining(startDate.plusDays(i), time));
             }
         }

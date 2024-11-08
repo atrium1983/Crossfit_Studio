@@ -41,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @GetMapping("/birthdays/{date}") // нужно для автоматической рассылки
+    @GetMapping("/birthdays/{date}")
     public ResponseEntity<List<User>> getAllWhoHasBirthday(@PathVariable LocalDate date){
         return ResponseEntity.ok(userService.findAllWhoHasBirthday(date));
 

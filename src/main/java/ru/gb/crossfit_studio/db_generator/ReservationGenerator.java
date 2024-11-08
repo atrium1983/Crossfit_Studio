@@ -62,7 +62,6 @@ public class ReservationGenerator {
         return trainings;
     }
 
-    // метод проверяет есть ли у Customer бронирование на ту же дату, на которую он хочет забронировать
     public boolean checkCustomerTrainingDate(User user, LocalDate date){
         List<Training> trainings = getListOfAllUserTraining(user);
         return trainings.stream()
